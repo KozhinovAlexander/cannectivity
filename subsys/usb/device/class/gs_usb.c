@@ -31,7 +31,6 @@ struct gs_usb_config {
 	struct usb_association_descriptor iad;
 	struct usb_if_descriptor if0;
 	struct usb_ep_descriptor if0_in_ep;
-	struct usb_ep_descriptor if0_dummy_ep;
 	struct usb_ep_descriptor if0_out_ep;
 } __packed;
 
@@ -1480,7 +1479,6 @@ static int gs_usb_init(const struct device *dev)
 		.iad = INITIALIZER_IAD,                                                            \
 		.if0 = INITIALIZER_IF,                                                             \
 		.if0_in_ep = INITIALIZER_IF_EP(GS_USB_IN_EP_ADDR),                                 \
-		.if0_dummy_ep = INITIALIZER_IF_EP(GS_USB_DUMMY_EP_ADDR),                           \
 		.if0_out_ep = INITIALIZER_IF_EP(GS_USB_OUT_EP_ADDR),                               \
 	};                                                                                         \
                                                                                                    \
@@ -1488,10 +1486,6 @@ static int gs_usb_init(const struct device *dev)
 		{                                                                                  \
 			.ep_cb = usb_transfer_ep_callback,                                         \
 			.ep_addr = GS_USB_IN_EP_ADDR,                                              \
-		},                                                                                 \
-		{                                                                                  \
-			.ep_cb = usb_transfer_ep_callback,                                         \
-			.ep_addr = GS_USB_DUMMY_EP_ADDR,                                           \
 		},                                                                                 \
 		{                                                                                  \
 			.ep_cb = usb_transfer_ep_callback,                                         \
