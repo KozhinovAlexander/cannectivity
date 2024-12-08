@@ -458,18 +458,13 @@ struct gs_usb_host_frame_hdr {
 /**
  * @name USB endpoint addresses
  *
- * Existing drivers expect endpoints 0x81 and 0x02. Include a dummy endpoint 0x01 to work-around the
- * endpoint address fixup of the Zephyr USB device stack.
- *
  * @{
  */
 
 /** USB bulk IN endpoint address */
 #define GS_USB_IN_EP_ADDR    0x81
-/** USB (dummy) bulk OUT endpoint address */
-#define GS_USB_DUMMY_EP_ADDR 0x01
 /** USB bulk OUT endpoint address */
-#define GS_USB_OUT_EP_ADDR   0x02
+#define GS_USB_OUT_EP_ADDR   0x01
 
 /** @} */
 
