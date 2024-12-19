@@ -24,14 +24,20 @@ LOG_MODULE_REGISTER(gs_usb, CONFIG_USB_DEVICE_GS_USB_LOG_LEVEL);
 
 /* USB endpoint indexes */
 #define GS_USB_IN_EP_IDX    0U
+#ifdef CONFIG_CANNECTIVITY_USB_DUMMY_EP
 #define GS_USB_DUMMY_EP_IDX 1U
 #define GS_USB_OUT_EP_IDX   2U
+#else
+#define GS_USB_OUT_EP_IDX   1U
+#endif /* CONFIG_CANNECTIVITY_USB_DUMMY_EP */
 
 struct gs_usb_config {
 	struct usb_association_descriptor iad;
 	struct usb_if_descriptor if0;
 	struct usb_ep_descriptor if0_in_ep;
+#ifdef CONFIG_CANNECTIVITY_USB_DUMMY_EP
 	struct usb_ep_descriptor if0_dummy_ep;
+#endif /* CONFIG_CANNECTIVITY_USB_DUMMY_EP */
 	struct usb_ep_descriptor if0_out_ep;
 } __packed;
 
@@ -1354,7 +1360,9 @@ static void gs_usb_status_callback(struct usb_cfg_data *cfg, enum usb_dc_status_
 	case USB_DC_CONFIGURED:
 		LOG_DBG("USB device configured");
 		LOG_DBG("EP IN addr = 0x%02x", cfg->endpoint[GS_USB_IN_EP_IDX].ep_addr);
+#ifdef CONFIG_CANNECTIVITY_USB_DUMMY_EP
 		LOG_DBG("EP DUMMY addr = 0x%02x", cfg->endpoint[GS_USB_DUMMY_EP_IDX].ep_addr);
+#endif /* CONFIG_CANNECTIVITY_USB_DUMMY_EP */
 		LOG_DBG("EP OUT addr = 0x%02x", cfg->endpoint[GS_USB_OUT_EP_IDX].ep_addr);
 		gs_usb_transfer_tx_prepare(common->dev);
 		break;
@@ -1456,7 +1464,7 @@ static int gs_usb_init(const struct device *dev)
 		.bDescriptorType = USB_DESC_INTERFACE,                                             \
 		.bInterfaceNumber = 0,                                                             \
 		.bAlternateSetting = 0,                                                            \
-		.bNumEndpoints = 3,                                                                \
+		.bNumEndpoints = GS_USB_NUM_ENDPOINTS,                                             \
 		.bInterfaceClass = USB_BCC_VENDOR,                                                 \
 		.bInterfaceSubClass = 0,                                                           \
 		.bInterfaceProtocol = 0,                                                           \
@@ -1486,7 +1494,6 @@ static int gs_usb_init(const struct device *dev)
 		.iad = INITIALIZER_IAD,                                                            \
 		.if0 = INITIALIZER_IF,                                                             \
 		.if0_in_ep = INITIALIZER_IF_EP(GS_USB_IN_EP_ADDR),                                 \
-		.if0_dummy_ep = INITIALIZER_IF_EP(GS_USB_DUMMY_EP_ADDR),                           \
 		.if0_out_ep = INITIALIZER_IF_EP(GS_USB_OUT_EP_ADDR),                               \
 	};                                                                                         \
                                                                                                    \
@@ -1494,10 +1501,6 @@ static int gs_usb_init(const struct device *dev)
 		{                                                                                  \
 			.ep_cb = usb_transfer_ep_callback,                                         \
 			.ep_addr = GS_USB_IN_EP_ADDR,                                              \
-		},                                                                                 \
-		{                                                                                  \
-			.ep_cb = usb_transfer_ep_callback,                                         \
-			.ep_addr = GS_USB_DUMMY_EP_ADDR,                                           \
 		},                                                                                 \
 		{                                                                                  \
 			.ep_cb = usb_transfer_ep_callback,                                         \
